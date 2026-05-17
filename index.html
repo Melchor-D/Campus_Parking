@@ -16,7 +16,7 @@
   </div>
 
   <!-- LOGIN -->
-  <div id="login-container" class="">
+  <div id="login-container">  
     <div class="login-card">
       <h2>Iniciar Sesión</h2>
 
@@ -36,9 +36,9 @@
     <nav class="navbar">
       <h2>Campus Parking</h2>
       <ul>
-        <li onclick="loadView('d')">Dashboard</li>
-        <li onclick="loadView('vehiculos')">Vehículos</li>
+        <li onclick="loadView('dashboard')">Dashboard</li>
         <li onclick="loadView('parqueo')">Parqueo</li>
+        <li onclick="loadView('historial')">Historial</li>
         <li onclick="logout()">Salir</li>
       </ul>
     </nav>
@@ -48,7 +48,7 @@
 
   <script src="storage.js"></script>
   <script src="components.js"></script>
-  <script src="login.js"></script>
   <script src="app.js"></script>
+  <script src="login.js"></script>
 </body>
 </html>

@@ -8,21 +8,28 @@ if (!localStorage.getItem("usuarios")) {
   localStorage.setItem("usuarios", JSON.stringify([admin]));
 }
 
-// Vehículos
+// Vehículos (tipos: carro, moto, bici)
 if (!localStorage.getItem("vehiculos")) {
   localStorage.setItem("vehiculos", JSON.stringify([]));
 }
 
-// Parqueos
+// Parqueos activos
 if (!localStorage.getItem("parqueos")) {
   localStorage.setItem("parqueos", JSON.stringify([]));
 }
 
+// Historial de salidas
+if (!localStorage.getItem("historial")) {
+  localStorage.setItem("historial", JSON.stringify([]));
+}
+
 const DB = {
   get(key) {
-    return JSON.parse(localStorage.getItem(key));
+    return JSON.parse(localStorage.getItem(key)) || [];
   },
   set(key, data) {
     localStorage.setItem(key, JSON.stringify(data));
   }
 };
+
+const MAX_SLOTS = 35;
