@@ -1,24 +1,54 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <link rel="stylesheet" href="/diseño.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Campus Parking</title>
+  <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-    
-    <div class="Container">
-        <div class="Form-container"> 
 
-        </div>
-        <div class="Banner">
+  <!-- LOADER -->
+  <div id="loader" class="loader">
+    <div class="spinner"></div>
+    <p>Cargando...</p>
+  </div>
 
-        </div>
+  <!-- LOGIN -->
+  <div id="login-container" class="">
+    <div class="login-card">
+      <h2>Iniciar Sesión</h2>
+
+      <input id="email" type="email" placeholder="Correo">
+      <input id="password" type="password" placeholder="Contraseña">
+
+      <button onclick="login()">Ingresar</button>
+
+      <p id="login-error" class="error"></p>
     </div>
+  </div>
 
+  <!-- APP -->
+  <div id="app" class="hidden">
 
-<script src="/parqueo.js"></script>
+    <!-- NAV -->
+    <nav class="navbar">
+      <h2>Campus Parking</h2>
+      <ul>
+        <li onclick="loadView('dashboard')">Dashboard</li>
+        <li onclick="loadView('vehiculos')">Vehículos</li>
+        <li onclick="loadView('parqueo')">Parqueo</li>
+        <li onclick="logout()">Salir</li>
+      </ul>
+    </nav>
 
+    <main id="view"></main>
+  </div>
+
+  <script src="storage.js"></script>
+  <script src="components.js"></script>
+  <script src="app.js"></script>
+  <script src="login.js"></script>
 </body>
 </html>

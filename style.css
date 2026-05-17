@@ -1,0 +1,110 @@
+:root {
+  --morado: #7f00ff;
+  --negro: #0a0a0a;
+  --gris: #1a1a1a;
+  --texto: #f2f2f2;
+}
+
+body {
+  margin: 0;
+  background: var(--negro);
+  color: var(--texto);
+  font-family: "Poppins", sans-serif;
+}
+
+/* Loader */
+.loader {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background: var(--negro);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.spinner {
+  width: 60px;
+  height: 60px;
+  border: 6px solid #333;
+  border-top-color: var(--morado);
+  border-radius: 50%;
+  animation: rotar 1s linear infinite;
+}
+@keyframes rotar { to { transform: rotate(360deg); } }
+
+/* Login */
+#login-container {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.login-card {
+  background: var(--gris);
+  padding: 30px;
+  width: 320px;
+  border-radius: 12px;
+  animation: fadeIn .4s ease;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+}
+
+/* Navbar */
+.navbar {
+  background: var(--gris);
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.navbar ul {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+}
+.navbar li:hover {
+  color: var(--morado);
+  cursor: pointer;
+}
+
+/* Cards */
+.card {
+  background: var(--gris);
+  padding: 20px;
+  margin: 10px 0;
+  border-radius: 10px;
+}
+
+.hidden { display: none; }
+
+button {
+  background: var(--morado);
+  padding: 10px;
+  width: 100%;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
+  transition: 0.3s;
+}
+button:hover {
+  opacity: 0.8;
+}
+
+input, select {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  background: #222;
+  border: 1px solid #333;
+  border-radius: 6px;
+  color: white;
+}
+
+.error {
+  color: red;
+  font-size: 0.8rem;
+}
