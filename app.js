@@ -45,10 +45,10 @@ function loadView(view) {
 
 // ───────────────────── panel ─────────────────────
 function renderDashboard() {
-  const parqueos = DB.get("parqueos");
-  const historial = DB.get("historial");
-  const libres    = MAX_SLOTS - parqueos.length;
-  const pct       = Math.round((parqueos.length / MAX_SLOTS) * 100);
+  const parqueos= DB.get("parqueos");
+  const historial= DB.get("historial");
+  const libres= MAX_SLOTS - parqueos.length;
+  const pct= Math.round((parqueos.length / MAX_SLOTS) * 100);
 
   const recaudado = historial.reduce((s, p) => s + p.totalPagado, 0);
   const hoy = historial.filter(p =>
