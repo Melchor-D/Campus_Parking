@@ -1,4 +1,4 @@
-/* ── Variables originales conservadas ── */
+
 :root {
   --morado: #7f00ff;
   --negro:  #0a0a0a;
@@ -21,7 +21,7 @@ body {
   font-family: "Poppins", sans-serif;
 }
 
-/* ── Loader ── */
+
 .loader {
   position: fixed;
   width: 100%; height: 100%;
@@ -41,7 +41,6 @@ body {
 }
 @keyframes rotar { to { transform: rotate(360deg); } }
 
-/* ── Login ── */
 #login-container {
   height: 100vh;
   display: flex;
@@ -64,7 +63,7 @@ body {
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ── Navbar ── */
+/* ── barra de navegación ── */
 .navbar {
   background: var(--gris);
   padding: 0 20px;
@@ -98,7 +97,7 @@ body {
 #view h2 { font-size: 20px; font-weight: 700; margin-bottom: 20px; letter-spacing: -.3px; }
 #view h3 { font-size: 14px; font-weight: 600; margin-bottom: 14px; color: var(--texto2); text-transform: uppercase; letter-spacing: .4px; }
 
-/* ── Stats row ── */
+
 .stats-row {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -119,7 +118,7 @@ body {
 .stat-card.purple .stat-value { color: #b57bff; }
 .stat-card.amber  .stat-value { color: var(--ambar); }
 
-/* ── Capacity map ── */
+
 .cap-section {
   background: var(--gris);
   border: 1px solid rgba(255,255,255,0.07);
@@ -150,7 +149,6 @@ body {
 .slot-dot.occ  { background: rgba(239,68,68,.13);  border-color: rgba(239,68,68,.3);  color: var(--rojo); }
 .slot-dot.free { background: rgba(34,197,94,.09);  border-color: rgba(34,197,94,.28); color: var(--verde); }
 
-/* ── Form card ── */
 .form-card {
   background: var(--gris);
   border: 1px solid rgba(255,255,255,0.07);
@@ -174,7 +172,7 @@ body {
   margin-bottom: 5px;
 }
 
-/* ── Form inline (Vehículos) ── */
+
 .form-inline {
   display: flex;
   gap: 10px;
@@ -184,7 +182,7 @@ body {
 }
 .form-inline input { flex: 1; min-width: 120px; }
 
-/* ── Table section ── */
+
 .table-section {
   background: var(--gris);
   border: 1px solid rgba(255,255,255,0.07);
@@ -209,7 +207,7 @@ tr:last-child td { border-bottom: none; }
 tr:hover td { background: rgba(255,255,255,0.03); }
 .empty-td { text-align: center; color: var(--texto3); padding: 36px; }
 
-/* ── Badges ── */
+
 .placa-badge {
   display: inline-block;
   background: #2a2a2a;
@@ -232,7 +230,7 @@ tr:hover td { background: rgba(255,255,255,0.03); }
 .tarifa-col { color: var(--verde); font-weight: 600; }
 .time-col   { color: #b57bff; font-weight: 500; font-size: 12px; }
 
-/* ── Botón salida ── */
+
 .btn-salida {
   background: rgba(239,68,68,.1);
   border: 1px solid rgba(239,68,68,.28);
@@ -244,7 +242,6 @@ tr:hover td { background: rgba(255,255,255,0.03); }
 }
 .btn-salida:hover { background: rgba(239,68,68,.22); }
 
-/* ── Total row ── */
 .total-row {
   display: flex; justify-content: flex-end; align-items: center; gap: 16px;
   padding: 12px 16px;
@@ -253,7 +250,6 @@ tr:hover td { background: rgba(255,255,255,0.03); }
 }
 .total-val { font-size: 15px; font-weight: 700; color: var(--verde); }
 
-/* ── Cards (vista Vehículos) ── */
 .card {
   background: var(--gris);
   padding: 20px; margin: 10px 0;
@@ -262,7 +258,6 @@ tr:hover td { background: rgba(255,255,255,0.03); }
 }
 .empty-msg { color: var(--texto3); font-size: 13px; margin-top: 8px; }
 
-/* ── Globals ── */
 .hidden { display: none !important; }
 
 button {

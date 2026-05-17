@@ -1,4 +1,4 @@
-// Ocultar loader y siempre mostrar login al cargar la página
+// login al cargar la página
 window.onload = () => {
   document.getElementById("loader").classList.add("hidden");
 

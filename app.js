@@ -1,4 +1,4 @@
-// ── Helpers ──────────────────────────────────────────────
+// ── ayuda ────────────────
 function usedSlots() {
   return DB.get("parqueos").map(p => p.slot);
 }
@@ -24,7 +24,6 @@ function tipoBadge(tipo) {
   return `<span class="tipo-badge ${t.cls}">${t.icon} ${t.label}</span>`;
 }
  
-// ── Cambiar vistas (estructura original) ─────────────────
 function loadView(view) {
   const cont = document.getElementById("view");
  
@@ -45,7 +44,7 @@ function loadView(view) {
   });
 }
  
-// ── DASHBOARD ────────────────────────────────────────────
+// ── panel ────────────────────────────────────────────
 function renderDashboard() {
   const parqueos = DB.get("parqueos");
   const historial = DB.get("historial");
@@ -123,7 +122,7 @@ function renderDashboard() {
   `;
 }
  
-// ── VEHÍCULOS (original conservado) ──────────────────────
+// ── Agregar VEHÍCULOS ─
 function renderVehiculos() {
   const lista = DB.get("vehiculos");
   const cont  = document.getElementById("view");

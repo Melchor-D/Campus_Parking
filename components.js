@@ -1,4 +1,4 @@
-// Card tipo de vehículo (vista Vehículos)
+// tipo de vehículo vista Vehículos
 class CardVehiculo extends HTMLElement {
   set data(v) {
     this.innerHTML = `

@@ -1,4 +1,4 @@
-// Usuario inicial
+// Usuario inicial admin
 if (!localStorage.getItem("usuarios")) {
   const admin = {
     email: "admin@campusparking.com",
