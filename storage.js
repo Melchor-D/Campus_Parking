@@ -1,4 +1,4 @@
-// Usuario inicial admin
+
 if (!localStorage.getItem("usuarios")) {
   const admin = {
     email: "admin@campusparking.com",
@@ -8,7 +8,7 @@ if (!localStorage.getItem("usuarios")) {
   localStorage.setItem("usuarios", JSON.stringify([admin]));
 }
 
-// Vehículos (tipos: carro, moto, bici)
+// Tipos de vehículo
 if (!localStorage.getItem("vehiculos")) {
   localStorage.setItem("vehiculos", JSON.stringify([]));
 }
@@ -18,7 +18,7 @@ if (!localStorage.getItem("parqueos")) {
   localStorage.setItem("parqueos", JSON.stringify([]));
 }
 
-// Historial de salidas
+// Historial
 if (!localStorage.getItem("historial")) {
   localStorage.setItem("historial", JSON.stringify([]));
 }

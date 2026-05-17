@@ -1,4 +1,4 @@
-// tipo de vehículo vista Vehículos
+// Tarifas de vehículo
 class CardVehiculo extends HTMLElement {
   set data(v) {
     this.innerHTML = `
