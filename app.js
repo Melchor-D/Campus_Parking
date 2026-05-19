@@ -141,7 +141,16 @@ function renderParqueo() {
         <td id="t-${p.id}" class="time-col">${fmt(Date.now() - p.entrada)}</td>
         <td>Q${p.tarifaHora}/h</td>
         <td id="q-${p.id}" class="tarifa-col">Q${calcTarifa(p.entrada, p.tarifaHora)}</td>
-        <td><button class="btn-salida" onclick="registrarSalida(${p.id})">Salida</button></td>
+        <td style="display:flex; gap:6px;">
+  <button onclick="editarParqueo(${p.id})">
+    Editar
+  </button>
+
+  <button class="btn-salida"
+    onclick="registrarSalida(${p.id})">
+    Salida
+  </button>
+</td>
       </tr>`).join("")
     : `<tr><td colspan="8" class="empty-td">Sin vehículos.</td></tr>`;
 
@@ -214,7 +223,7 @@ if (!regexPlaca.test(placa)) {
     id: Date.now(),
     placa,
     tipo,
-    slot,
+    slot, 
     entrada: Date.now(),
     tarifaHora: tarifa
   });
@@ -250,6 +259,35 @@ function registrarSalida(id) {
 
   alert(`Salida registrada.\nTiempo: ${horas}h\nTotal: Q${total}`);
   renderParqueo();
+}
+
+//----------------------------------
+function editarParqueo(id) {
+
+  const parqueos = DB.get("parqueos");
+
+  const vehiculo = parqueos.find(p => p.id === id);
+
+  if (!vehiculo) return;
+
+  document.getElementById("editId").value = vehiculo.id;
+
+  document.getElementById("editPlaca").value = vehiculo.placa;
+
+  document.getElementById("editTipo").value = vehiculo.tipo;
+
+  document.getElementById("editSlot").value = vehiculo.slot;
+
+  document.getElementById("editTarifa").value = vehiculo.tarifaHora;
+
+  document.getElementById("modalEditar")
+    .classList.remove("hidden");
+}
+function cerrarModalEditar() {
+
+  document.getElementById("modalEditar")
+    .classList.add("hidden");
+
 }
 
 // ───────────────────── Historial ─────────────────────
@@ -341,3 +379,50 @@ function guardarPerfil() {
   alert("Datos actualizados 👍");
   closeProfile();
 }
+
+//-ediatar usuarios registrados
+
+function guardarEdicion() {
+  const id = parseInt(
+    document.getElementById("editId").value
+  );
+  const placa = document.getElementById("editPlaca")
+    .value
+    .trim()
+    .toUpperCase();
+  const tipo = document.getElementById("editTipo").value;
+  const slot = parseInt(
+    document.getElementById("editSlot").value
+  );
+  const tarifa = parseFloat(
+    document.getElementById("editTarifa").value
+  );
+  const parqueos = DB.get("parqueos");
+  const idx = parqueos.findIndex(p => p.id === id);
+  if (idx === -1) {
+    alert("Vehículo no encontrado");
+    return;
+  }
+  const regexPlaca = /^[A-Z]{3}[0-9]{3}$/;
+  if (!regexPlaca.test(placa)) {
+    alert("Formato inválido");
+    return;
+  }
+  const ocupado = parqueos.find(p =>
+    p.slot === slot && p.id !== id
+  );
+  if (ocupado) {
+    alert("Ese espacio ya está ocupado");
+    return;
+  }
+  parqueos[idx].placa = placa;
+  parqueos[idx].tipo = tipo;
+  parqueos[idx].slot = slot;
+  parqueos[idx].tarifaHora = tarifa;
+
+  DB.set("parqueos", parqueos);
+  cerrarModalEditar();
+  renderParqueo();
+  alert("Vehículo actualizado correctamente");
+}
+
