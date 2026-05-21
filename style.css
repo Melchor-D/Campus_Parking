@@ -337,3 +337,12 @@ select option { background: #222; }
 .btn-cerrar:hover {
   opacity: .7;
 }
+/* Animación suave que se mira pro */
+.fade {
+  animation: fadeIn .35s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

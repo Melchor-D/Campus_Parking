@@ -1,18 +1,24 @@
+// =================== FUNCIONES ÚTILES ===================
+
+// ver los espacios ya usados
 function usedSlots() {
   return DB.get("parqueos").map(p => p.slot);
 }
 
+// formato bonito del tiempo
 function fmt(ms) {
   const h = Math.floor(ms / 3600000);
   const m = Math.floor((ms % 3600000) / 60000);
   return h > 0 ? `${h}h ${m}m` : `${m}m`;
 }
 
+// calcular tarifa total
 function calcTarifa(entrada, tarifaHora) {
   const horas = Math.max(Math.ceil((Date.now() - entrada) / 3600000), 1);
   return (horas * tarifaHora).toFixed(2);
 }
 
+// etiquetas de tipo de vehículo (para que se mire bonito)
 function tipoBadge(tipo) {
   const map = {
     carro: { cls: "badge-carro", icon: "🚗", label: "Carro" },
@@ -23,17 +29,17 @@ function tipoBadge(tipo) {
   return `<span class="tipo-badge ${t.cls}">${t.icon} ${t.label}</span>`;
 }
 
-// ───────────────────── Vista principal ─────────────────────
+// =================== CAMBIO DE VISTAS ===================
 function loadView(view) {
   const cont = document.getElementById("view");
 
   switch (view) {
     case "dashboard":  renderDashboard();  break;
-    case "vehiculos":  renderVehiculos();  break;
     case "parqueo":    renderParqueo();    break;
     case "historial":  renderHistorial();  break;
   }
 
+  // actualizar navbar
   document.querySelectorAll(".navbar li").forEach(li => li.classList.remove("active"));
   const navItems = document.querySelectorAll(".navbar li");
   navItems.forEach(li => {
@@ -41,35 +47,41 @@ function loadView(view) {
       li.classList.add("active");
     }
   });
+
+  // animación elegante suave
+  cont.classList.remove("fade");
+  void cont.offsetWidth;
+  cont.classList.add("fade");
 }
 
-// ───────────────────── panel ─────────────────────
+// =================== DASHBOARD ===================
 function renderDashboard() {
-  const parqueos= DB.get("parqueos");
-  const historial= DB.get("historial");
-  const libres= MAX_SLOTS - parqueos.length;
-  const pct= Math.round((parqueos.length / MAX_SLOTS) * 100);
+  const parqueos = DB.get("parqueos");
+  const historial = DB.get("historial");
+
+  const libres = MAX_SLOTS - parqueos.length;
+  const pct = Math.round((parqueos.length / MAX_SLOTS) * 100);
 
   const recaudado = historial.reduce((s, p) => s + p.totalPagado, 0);
   const hoy = historial.filter(p =>
     new Date(p.salida).toDateString() === new Date().toDateString()
   ).length;
 
-  // mapa
-  const used = usedSlots();
+  // mapa de espacios
   let slotDots = "";
+  const used = usedSlots();
   for (let i = 1; i <= MAX_SLOTS; i++) {
     const occ = used.includes(i);
     slotDots += `<div class="slot-dot ${occ ? "occ" : "free"}">${i}</div>`;
   }
 
-  // tabla
+  // tabla de activos
   let filas = parqueos.length
     ? parqueos.map(p => `
       <tr>
         <td><span class="placa-badge">${p.placa}</span></td>
         <td>${tipoBadge(p.tipo)}</td>
-        <td><b>${p.slot}</b></td>
+        <td>${p.slot}</td>
         <td>${fmt(Date.now() - p.entrada)}</td>
         <td class="tarifa-col">Q${calcTarifa(p.entrada, p.tarifaHora)}</td>
       </tr>`).join("")
@@ -82,19 +94,20 @@ function renderDashboard() {
       <div class="stat-card green">
         <p class="stat-label">Libres</p>
         <p class="stat-value">${libres}</p>
-        <p class="stat-sub">de ${MAX_SLOTS}</p>
       </div>
+
       <div class="stat-card red">
         <p class="stat-label">Ocupados</p>
         <p class="stat-value">${parqueos.length}</p>
-        <p class="stat-sub">${pct}%</p>
       </div>
+
       <div class="stat-card purple">
         <p class="stat-label">Salidas hoy</p>
         <p class="stat-value">${hoy}</p>
       </div>
+
       <div class="stat-card amber">
-        <p class="stat-label">Recaudado</p>
+        <p'stat-label">Recaudado</p>
         <p class="stat-value">Q${recaudado.toFixed(2)}</p>
       </div>
     </div>
@@ -112,7 +125,9 @@ function renderDashboard() {
       <h3>Vehículos activos</h3>
       <table>
         <thead>
-          <tr><th>Placa</th><th>Tipo</th><th>Espacio</th><th>Tiempo</th><th>Total</th></tr>
+          <tr>
+            <th>Placa</th><th>Tipo</th><th>Espacio</th><th>Tiempo</th><th>Total</th>
+          </tr>
         </thead>
         <tbody>${filas}</tbody>
       </table>
@@ -120,17 +135,19 @@ function renderDashboard() {
   `;
 }
 
-// ───────────────────── Parqueo (ingresos) ─────────────────────
+// =================== PARQUEO ===================
 function renderParqueo() {
   const parqueos = DB.get("parqueos");
   const used = usedSlots();
 
+  // generar lista de espacios disponibles
   let slotOptions = "";
   for (let i = 1; i <= MAX_SLOTS; i++) {
     if (!used.includes(i)) slotOptions += `<option value="${i}">Espacio ${i}</option>`;
   }
   if (!slotOptions) slotOptions = `<option disabled>No hay espacios</option>`;
 
+  // filas
   let filas = parqueos.length
     ? parqueos.map(p => `
       <tr>
@@ -141,29 +158,46 @@ function renderParqueo() {
         <td id="t-${p.id}" class="time-col">${fmt(Date.now() - p.entrada)}</td>
         <td>Q${p.tarifaHora}/h</td>
         <td id="q-${p.id}" class="tarifa-col">Q${calcTarifa(p.entrada, p.tarifaHora)}</td>
-        <td style="display:flex; gap:6px;">
-  <button onclick="editarParqueo(${p.id})">
-    Editar
-  </button>
-
-  <button class="btn-salida"
-    onclick="registrarSalida(${p.id})">
-    Salida
-  </button>
-</td>
+        <td>
+          <button onclick="editarParqueo(${p.id})">Editar</button>
+          <button class="btn-salida" onclick="registrarSalida(${p.id})">Salida</button>
+        </td>
       </tr>`).join("")
     : `<tr><td colspan="8" class="empty-td">Sin vehículos.</td></tr>`;
 
+  // vista
   document.getElementById("view").innerHTML = `
     <h2>Registro de Parqueo</h2>
+
+    <!-- TABLA DE TARIFAS FIJAS -->
+    <div class="table-section" style="margin-bottom: 20px;">
+      <h3>Tarifas por tipo</h3>
+      <table>
+        <thead>
+          <tr><th>Tipo</th><th>Tarifa por hora</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Carro</td><td>Q20.00</td></tr>
+          <tr><td>Moto</td><td>Q15.00</td></tr>
+          <tr><td>Bici</td><td>Q10.00</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Buscador -->
+    <div class="form-field">
+      <label>Buscar por placa</label>
+      <input id="buscarPlaca" oninput="filtrarParqueo()" placeholder="Ej: ABC123">
+    </div>
 
     <div class="form-card">
       <h3>Nuevo ingreso</h3>
       <div class="form-grid">
         <div class="form-field">
           <label>Placa</label>
-          <input id="placa" style="text-transform:uppercase">
+          <input id="placa" style="text-transform: uppercase">
         </div>
+
         <div class="form-field">
           <label>Tipo</label>
           <select id="tipoVeh">
@@ -172,14 +206,12 @@ function renderParqueo() {
             <option value="bici">Bici</option>
           </select>
         </div>
+
         <div class="form-field">
           <label>Espacio</label>
           <select id="slot">${slotOptions}</select>
         </div>
-        <div class="form-field">
-          <label>Tarifa</label>
-          <input id="tarifa" type="number" value="5">
-        </div>
+
         <button onclick="agregarParqueo()">Registrar entrada</button>
       </div>
     </div>
@@ -189,8 +221,8 @@ function renderParqueo() {
       <table>
         <thead>
           <tr>
-            <th>Placa</th><th>Tipo</th><th>Espacio</th><th>Entrada</th>
-            <th>Tiempo</th><th>Tarifa</th><th>Total</th><th>Acción</th>
+            <th>Placa</th><th>Tipo</th><th>Espacio</th>
+            <th>Entrada</th><th>Tiempo</th><th>Tarifa</th><th>Total</th><th>Acción</th>
           </tr>
         </thead>
         <tbody>${filas}</tbody>
@@ -199,21 +231,32 @@ function renderParqueo() {
   `;
 }
 
+// =================== AGREGAR PARQUEO ===================
 function agregarParqueo() {
   const placa  = document.getElementById("placa").value.trim().toUpperCase();
   const tipo   = document.getElementById("tipoVeh").value;
   const slot   = parseInt(document.getElementById("slot").value);
-  const tarifa = parseFloat(document.getElementById("tarifa").value) || 5;
 
- const regexPlaca = /^[A-Z]{3}[0-9]{3}$/;
-if (!regexPlaca.test(placa)) {
-  alert("Formato de placa incorrecto (Ej: ABC123)");
-  return;
-}   
-  if (!slot)  { alert("No hay espacio."); return; }
+  // tarifas fijas
+  const tarifasFijas = { carro: 20, moto: 15, bici: 10 };
+  const tarifa = tarifasFijas[tipo];
+
+  // validación placa
+  const regexPlaca = /^[A-Z]{3}[0-9]{3}$/;
+  if (!regexPlaca.test(placa)) {
+    alert("Formato de placa incorrecto (Ej: ABC123)");
+    return;
+  }
+
+  // validar slot
+  if (slot < 1 || slot > MAX_SLOTS) {
+    alert("El slot no existe.");
+    return;
+  }
 
   const parqueos = DB.get("parqueos");
 
+  // validar placa repetida
   if (parqueos.find(p => p.placa === placa)) {
     alert("Esta placa ya está ingresada.");
     return;
@@ -223,31 +266,31 @@ if (!regexPlaca.test(placa)) {
     id: Date.now(),
     placa,
     tipo,
-    slot, 
+    slot,
     entrada: Date.now(),
     tarifaHora: tarifa
   });
 
   DB.set("parqueos", parqueos);
   renderParqueo();
+  alert("Vehículo ingresado con éxito 👍");
 }
 
-// ───────────────────── Salidas ─────────────────────
+// =================== SALIDA ===================
 function registrarSalida(id) {
   const parqueos = DB.get("parqueos");
   const idx = parqueos.findIndex(p => p.id === id);
   if (idx === -1) return;
 
-  const p = parqueos[idx];
+  const v = parqueos[idx];
   const salida = Date.now();
 
-  const horas = Math.max(Math.ceil((salida - p.entrada) / 3600000), 1);
-  const total = (horas * p.tarifaHora).toFixed(2);
+  const horas = Math.max(Math.ceil((salida - v.entrada) / 3600000), 1);
+  const total = (horas * v.tarifaHora).toFixed(2);
 
   const historial = DB.get("historial");
-
   historial.unshift({
-    ...p,
+    ...v,
     salida,
     horas,
     totalPagado: parseFloat(total)
@@ -261,36 +304,18 @@ function registrarSalida(id) {
   renderParqueo();
 }
 
-//----------------------------------
-function editarParqueo(id) {
+// =================== BUSCADOR PRO ===================
+function filtrarParqueo() {
+  const filtro = document.getElementById("buscarPlaca").value.trim().toUpperCase();
+  const filas = [...document.querySelectorAll("#view table tbody tr")];
 
-  const parqueos = DB.get("parqueos");
-
-  const vehiculo = parqueos.find(p => p.id === id);
-
-  if (!vehiculo) return;
-
-  document.getElementById("editId").value = vehiculo.id;
-
-  document.getElementById("editPlaca").value = vehiculo.placa;
-
-  document.getElementById("editTipo").value = vehiculo.tipo;
-
-  document.getElementById("editSlot").value = vehiculo.slot;
-
-  document.getElementById("editTarifa").value = vehiculo.tarifaHora;
-
-  document.getElementById("modalEditar")
-    .classList.remove("hidden");
-}
-function cerrarModalEditar() {
-
-  document.getElementById("modalEditar")
-    .classList.add("hidden");
-
+  filas.forEach(row => {
+    const placa = row.querySelector(".placa-badge")?.textContent || "";
+    row.style.display = placa.includes(filtro) ? "" : "none";
+  });
 }
 
-// ───────────────────── Historial ─────────────────────
+// =================== HISTORIAL ===================
 function renderHistorial() {
   const historial = DB.get("historial");
   const total = historial.reduce((s, p) => s + p.totalPagado, 0);
@@ -316,8 +341,8 @@ function renderHistorial() {
       <table>
         <thead>
           <tr>
-            <th>Placa</th><th>Tipo</th><th>Espacio</th><th>Entrada</th>
-            <th>Salida</th><th>Horas</th><th>Tarifa</th><th>Total</th>
+            <th>Placa</th><th>Tipo</th><th>Espacio</th>
+            <th>Entrada</th><th>Salida</th><th>Horas</th><th>Tarifa</th><th>Total</th>
           </tr>
         </thead>
         <tbody>${filas}</tbody>
@@ -331,7 +356,7 @@ function renderHistorial() {
   `;
 }
 
-// ───────────────────── Actualizar cada minuto ─────────────────────
+// =================== ACTUALIZAR TIEMPOS ===================
 setInterval(() => {
   DB.get("parqueos").forEach(p => {
     const te = document.getElementById("t-" + p.id);
@@ -340,89 +365,3 @@ setInterval(() => {
     if (tq) tq.textContent = "Q" + calcTarifa(p.entrada, p.tarifaHora);
   });
 }, 60000);
-
-function openProfile() {
-  const user = JSON.parse(localStorage.getItem("sesion"));
-
-  document.getElementById("perfilNombre").value = user.nombre;
-  document.getElementById("perfilCorreo").value = user.email;
-  document.getElementById("perfilPass").value = "";
-
-  document.getElementById("modalPerfil").classList.remove("hidden");
-}
-
-function closeProfile() {
-  document.getElementById("modalPerfil").classList.add("hidden");
-}
-function guardarPerfil() {
-  const nombre = document.getElementById("perfilNombre").value.trim();
-  const correo = document.getElementById("perfilCorreo").value.trim();
-  const pass   = document.getElementById("perfilPass").value.trim();
-
-  if (!nombre || !correo) {
-    alert("Nombre y correo no pueden estar vacíos.");
-    return;
-  }
-
-  let usuarios = DB.get("usuarios");
-  let sesion   = JSON.parse(localStorage.getItem("sesion"));
-
-  const idx = usuarios.findIndex(u => u.email === sesion.email);
-
-  usuarios[idx].nombre = nombre;
-  usuarios[idx].email  = correo;
-  if (pass) usuarios[idx].password = pass;
-
-  DB.set("usuarios", usuarios);
-  localStorage.setItem("sesion", JSON.stringify(usuarios[idx]));
-
-  alert("Datos actualizados 👍");
-  closeProfile();
-}
-
-//-ediatar usuarios registrados
-
-function guardarEdicion() {
-  const id = parseInt(
-    document.getElementById("editId").value
-  );
-  const placa = document.getElementById("editPlaca")
-    .value
-    .trim()
-    .toUpperCase();
-  const tipo = document.getElementById("editTipo").value;
-  const slot = parseInt(
-    document.getElementById("editSlot").value
-  );
-  const tarifa = parseFloat(
-    document.getElementById("editTarifa").value
-  );
-  const parqueos = DB.get("parqueos");
-  const idx = parqueos.findIndex(p => p.id === id);
-  if (idx === -1) {
-    alert("Vehículo no encontrado");
-    return;
-  }
-  const regexPlaca = /^[A-Z]{3}[0-9]{3}$/;
-  if (!regexPlaca.test(placa)) {
-    alert("Formato inválido");
-    return;
-  }
-  const ocupado = parqueos.find(p =>
-    p.slot === slot && p.id !== id
-  );
-  if (ocupado) {
-    alert("Ese espacio ya está ocupado");
-    return;
-  }
-  parqueos[idx].placa = placa;
-  parqueos[idx].tipo = tipo;
-  parqueos[idx].slot = slot;
-  parqueos[idx].tarifaHora = tarifa;
-
-  DB.set("parqueos", parqueos);
-  cerrarModalEditar();
-  renderParqueo();
-  alert("Vehículo actualizado correctamente");
-}
-
