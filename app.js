@@ -365,3 +365,62 @@ setInterval(() => {
     if (tq) tq.textContent = "Q" + calcTarifa(p.entrada, p.tarifaHora);
   });
 }, 60000);
+
+
+// =================== ABRIR EL MODAL DE EDITAR ===================
+function editarParqueo(id) {
+  const parqueos = DB.get("parqueos");
+  const v = parqueos.find(p => p.id === id);
+  if (!v) return;
+
+  // llenar los campos
+  document.getElementById("editId").value = v.id;
+  document.getElementById("editPlaca").value = v.placa;
+  document.getElementById("editTipo").value = v.tipo;
+  document.getElementById("editSlot").value = v.slot;
+
+  document.getElementById("modalEditar").classList.remove("hidden");
+}
+
+// =================== CERRAR MODAL ===================
+function cerrarModalEditar() {
+  document.getElementById("modalEditar").classList.add("hidden");
+}
+
+// =================== GUARDAR EDICIÓN ===================
+function guardarEdicion() {
+  const id = parseInt(document.getElementById("editId").value);
+  const placa = document.getElementById("editPlaca").value.trim().toUpperCase();
+  const tipo = document.getElementById("editTipo").value;
+  const slot = parseInt(document.getElementById("editSlot").value);
+
+  const regexPlaca = /^[A-Z]{3}[0-9]{3}$/;
+  if (!regexPlaca.test(placa)) {
+    alert("Formato inválido. Ej: ABC123");
+    return;
+  }
+
+  const parqueos = DB.get("parqueos");
+  const idx = parqueos.findIndex(p => p.id === id);
+
+  if (idx === -1) return;
+
+  // revisa si ese slot ya lo está usando otro carro
+  const ocupado = parqueos.find(p => p.slot === slot && p.id !== id);
+  if (ocupado) {
+    alert("Ese espacio ya está ocupado.");
+    return;
+  }
+
+  // actualizar
+  parqueos[idx].placa = placa;
+  parqueos[idx].tipo = tipo;
+  parqueos[idx].slot = slot;
+
+  DB.set("parqueos", parqueos);
+
+  cerrarModalEditar();
+  renderParqueo();
+
+  alert("Vehículo actualizado con éxito 👍");
+}

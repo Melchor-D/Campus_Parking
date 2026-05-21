@@ -59,15 +59,17 @@
   </div>
 </div>
 
-
+<!-- MODAL PARA EDITAR VEHÍCULO -->
 <div id="modalEditar" class="modal hidden">
   <div class="modal-content">
     <h2>Editar Vehículo</h2>
+
     <input type="hidden" id="editId">
+
     <label>Placa</label>
     <input id="editPlaca" type="text">
-    <label>Tipo</label>
 
+    <label>Tipo</label>
     <select id="editTipo">
       <option value="carro">Carro</option>
       <option value="moto">Moto</option>
@@ -77,16 +79,8 @@
     <label>Espacio</label>
     <input id="editSlot" type="number">
 
-    <label>Tarifa</label>
-    <input id="editTarifa" type="number">
-
-    <button onclick="guardarEdicion()">
-      Guardar cambios
-    </button>
-    <button class="btn-cerrar"
-      onclick="cerrarModalEditar()">
-      Cancelar
-    </button>
+    <button onclick="guardarEdicion()">Guardar cambios</button>
+    <button class="btn-cerrar" onclick="cerrarModalEditar()">Cerrar</button>
   </div>
 </div>
 
