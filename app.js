@@ -1,24 +1,18 @@
-// =================== FUNCIONES ÚTILES ===================
-
-// ver los espacios ya usados
 function usedSlots() {
   return DB.get("parqueos").map(p => p.slot);
 }
 
-// formato bonito del tiempo
 function fmt(ms) {
   const h = Math.floor(ms / 3600000);
   const m = Math.floor((ms % 3600000) / 60000);
   return h > 0 ? `${h}h ${m}m` : `${m}m`;
 }
 
-// calcular tarifa total
 function calcTarifa(entrada, tarifaHora) {
   const horas = Math.max(Math.ceil((Date.now() - entrada) / 3600000), 1);
   return (horas * tarifaHora).toFixed(2);
 }
 
-// etiquetas de tipo de vehículo (para que se mire bonito)
 function tipoBadge(tipo) {
   const map = {
     carro: { cls: "badge-carro", icon: "🚗", label: "Carro" },
@@ -29,17 +23,15 @@ function tipoBadge(tipo) {
   return `<span class="tipo-badge ${t.cls}">${t.icon} ${t.label}</span>`;
 }
 
-// =================== CAMBIO DE VISTAS ===================
 function loadView(view) {
   const cont = document.getElementById("view");
 
-  switch (view) {
+switch (view) {
     case "dashboard":  renderDashboard();  break;
     case "parqueo":    renderParqueo();    break;
     case "historial":  renderHistorial();  break;
-  }
-
-  // actualizar navbar
+    case "perfil":     renderPerfil();     break;
+}
   document.querySelectorAll(".navbar li").forEach(li => li.classList.remove("active"));
   const navItems = document.querySelectorAll(".navbar li");
   navItems.forEach(li => {
@@ -47,14 +39,11 @@ function loadView(view) {
       li.classList.add("active");
     }
   });
-
-  // animación elegante suave
   cont.classList.remove("fade");
   void cont.offsetWidth;
   cont.classList.add("fade");
 }
 
-// =================== DASHBOARD ===================
 function renderDashboard() {
   const parqueos = DB.get("parqueos");
   const historial = DB.get("historial");
@@ -66,8 +55,7 @@ function renderDashboard() {
   const hoy = historial.filter(p =>
     new Date(p.salida).toDateString() === new Date().toDateString()
   ).length;
-
-  // mapa de espacios
+  
   let slotDots = "";
   const used = usedSlots();
   for (let i = 1; i <= MAX_SLOTS; i++) {
@@ -75,7 +63,6 @@ function renderDashboard() {
     slotDots += `<div class="slot-dot ${occ ? "occ" : "free"}">${i}</div>`;
   }
 
-  // tabla de activos
   let filas = parqueos.length
     ? parqueos.map(p => `
       <tr>
@@ -134,20 +121,16 @@ function renderDashboard() {
     </div>
   `;
 }
-
-// =================== PARQUEO ===================
 function renderParqueo() {
   const parqueos = DB.get("parqueos");
   const used = usedSlots();
 
-  // generar lista de espacios disponibles
   let slotOptions = "";
   for (let i = 1; i <= MAX_SLOTS; i++) {
     if (!used.includes(i)) slotOptions += `<option value="${i}">Espacio ${i}</option>`;
   }
   if (!slotOptions) slotOptions = `<option disabled>No hay espacios</option>`;
 
-  // filas
   let filas = parqueos.length
     ? parqueos.map(p => `
       <tr>
@@ -165,7 +148,6 @@ function renderParqueo() {
       </tr>`).join("")
     : `<tr><td colspan="8" class="empty-td">Sin vehículos.</td></tr>`;
 
-  // vista
   document.getElementById("view").innerHTML = `
     <h2>Registro de Parqueo</h2>
 
@@ -230,25 +212,20 @@ function renderParqueo() {
     </div>
   `;
 }
-
-// =================== AGREGAR PARQUEO ===================
 function agregarParqueo() {
   const placa  = document.getElementById("placa").value.trim().toUpperCase();
   const tipo   = document.getElementById("tipoVeh").value;
   const slot   = parseInt(document.getElementById("slot").value);
 
-  // tarifas fijas
   const tarifasFijas = { carro: 20, moto: 15, bici: 10 };
   const tarifa = tarifasFijas[tipo];
 
-  // validación placa
   const regexPlaca = /^[A-Z]{3}[0-9]{3}$/;
   if (!regexPlaca.test(placa)) {
     alert("Formato de placa incorrecto (Ej: ABC123)");
     return;
   }
 
-  // validar slot
   if (slot < 1 || slot > MAX_SLOTS) {
     alert("El slot no existe.");
     return;
@@ -256,7 +233,6 @@ function agregarParqueo() {
 
   const parqueos = DB.get("parqueos");
 
-  // validar placa repetida
   if (parqueos.find(p => p.placa === placa)) {
     alert("Esta placa ya está ingresada.");
     return;
@@ -276,7 +252,6 @@ function agregarParqueo() {
   alert("Vehículo ingresado con éxito 👍");
 }
 
-// =================== SALIDA ===================
 function registrarSalida(id) {
   const parqueos = DB.get("parqueos");
   const idx = parqueos.findIndex(p => p.id === id);
@@ -304,7 +279,6 @@ function registrarSalida(id) {
   renderParqueo();
 }
 
-// =================== BUSCADOR PRO ===================
 function filtrarParqueo() {
   const filtro = document.getElementById("buscarPlaca").value.trim().toUpperCase();
   const filas = [...document.querySelectorAll("#view table tbody tr")];
@@ -315,7 +289,6 @@ function filtrarParqueo() {
   });
 }
 
-// =================== HISTORIAL ===================
 function renderHistorial() {
   const historial = DB.get("historial");
   const total = historial.reduce((s, p) => s + p.totalPagado, 0);
@@ -355,8 +328,6 @@ function renderHistorial() {
     </div>
   `;
 }
-
-// =================== ACTUALIZAR TIEMPOS ===================
 setInterval(() => {
   DB.get("parqueos").forEach(p => {
     const te = document.getElementById("t-" + p.id);
@@ -366,8 +337,6 @@ setInterval(() => {
   });
 }, 60000);
 
-
-// =================== ABRIR EL MODAL DE EDITAR ===================
 function editarParqueo(id) {
   const parqueos = DB.get("parqueos");
   const v = parqueos.find(p => p.id === id);
@@ -382,12 +351,10 @@ function editarParqueo(id) {
   document.getElementById("modalEditar").classList.remove("hidden");
 }
 
-// =================== CERRAR MODAL ===================
 function cerrarModalEditar() {
   document.getElementById("modalEditar").classList.add("hidden");
 }
 
-// =================== GUARDAR EDICIÓN ===================
 function guardarEdicion() {
   const id = parseInt(document.getElementById("editId").value);
   const placa = document.getElementById("editPlaca").value.trim().toUpperCase();
@@ -404,15 +371,11 @@ function guardarEdicion() {
   const idx = parqueos.findIndex(p => p.id === id);
 
   if (idx === -1) return;
-
-  // revisa si ese slot ya lo está usando otro carro
   const ocupado = parqueos.find(p => p.slot === slot && p.id !== id);
   if (ocupado) {
     alert("Ese espacio ya está ocupado.");
     return;
   }
-
-  // actualizar
   parqueos[idx].placa = placa;
   parqueos[idx].tipo = tipo;
   parqueos[idx].slot = slot;
@@ -423,4 +386,34 @@ function guardarEdicion() {
   renderParqueo();
 
   alert("Vehículo actualizado con éxito 👍");
+}
+
+
+
+// Vista principal del reporte
+function renderReporte() {
+
+  document.getElementById("view").innerHTML = `
+    <h2>Reporte por rango de fechas</h2>
+
+    <div class="form-card">
+      <div class="form-grid" style="grid-template-columns: 1fr 1fr auto;">
+        
+        <div class="form-field">
+          <label>Fecha Inicial</label>
+          <input type="date" id="fechaInicio">
+        </div>
+
+        <div class="form-field">
+          <label>Fecha Final</label>
+          <input type="date" id="fechaFin">
+        </div>
+
+        <button onclick="generarReporte()">Generar</button>
+
+      </div>
+    </div>
+
+    <div id="reporteResultados"></div>
+  `;
 }

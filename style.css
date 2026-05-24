@@ -337,7 +337,7 @@ select option { background: #222; }
 .btn-cerrar:hover {
   opacity: .7;
 }
-/* Animación suave que se mira pro */
+
 .fade {
   animation: fadeIn .35s ease;
 }
