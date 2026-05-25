@@ -1,3 +1,5 @@
+
+//examen 
 function usedSlots() {
   return DB.get("parqueos").map(p => p.slot);
 }
@@ -12,7 +14,7 @@ function calcTarifa(entrada, tarifaHora) {
   const horas = Math.max(Math.ceil((Date.now() - entrada) / 3600000), 1);
   return (horas * tarifaHora).toFixed(2);
 }
-
+//=============================================================================
 function tipoBadge(tipo) {
   const map = {
     carro: { cls: "badge-carro", icon: "🚗", label: "Carro" },
@@ -342,7 +344,7 @@ function editarParqueo(id) {
   const v = parqueos.find(p => p.id === id);
   if (!v) return;
 
-  // llenar los campos
+ 
   document.getElementById("editId").value = v.id;
   document.getElementById("editPlaca").value = v.placa;
   document.getElementById("editTipo").value = v.tipo;
@@ -390,7 +392,7 @@ function guardarEdicion() {
 
 
 
-// Vista principal del reporte
+// examen 
 function renderReporte() {
 
   document.getElementById("view").innerHTML = `
@@ -417,3 +419,69 @@ function renderReporte() {
     <div id="reporteResultados"></div>
   `;
 }
+
+function generarReporte() {
+
+  const inicio = document.getElementById("fechaInicio").value;
+  const fin    = document.getElementById("fechaFin").value;
+
+  if (!inicio || !fin) {
+    alert("Ingresá ambas fechas para generar el reporte.");
+    return;
+  }
+
+  const fechaInicio = new Date(inicio + " 00:00:00");
+  const fechaFin    = new Date(fin    + " 23:59:59");
+
+  const historial = DB.get("historial");
+
+  const filtrados = historial.filter(p => {
+    const fechaSalida = new Date(p.salida);
+    return fechaSalida >= fechaInicio && fechaSalida <= fechaFin;
+  });
+
+  const totalVehiculos = filtrados.length;
+  const totalRecaudado = filtrados.reduce((s, p) => s + p.totalPagado, 0);
+
+  let filas = filtrados.length
+    ? filtrados.map(p => `
+      <tr>
+        <td><span class="placa-badge">${p.placa}</span></td>
+        <td>${tipoBadge(p.tipo)}</td>
+        <td>${p.horas}h</td>
+        <td>Q${p.totalPagado.toFixed(2)}</td>
+      </tr>
+    `).join("")
+    : `<tr><td colspan="4" class="empty-td">No hay datos en este rango.</td></tr>`;
+
+  document.getElementById("reporteResultados").innerHTML = `
+    
+    <div class="stats-row">
+      <div class="stat-card purple">
+        <p class="stat-label">Vehículos atendidos</p>
+        <p class="stat-value">${totalVehiculos}</p>
+      </div>
+
+      <div class="stat-card green">
+        <p class="stat-label">Total recaudado</p>
+        <p class="stat-value">Q${totalRecaudado.toFixed(2)}</p>
+      </div>
+    </div>
+
+    <div class="table-section">
+      <h3>Detalle del reporte</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Placa</th>
+            <th>Tipo</th>
+            <th>Horas</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>${filas}</tbody>
+      </table>
+    </div>
+  `;
+}
+//========================================0
